@@ -6,6 +6,7 @@ class BlogsController < ApplicationController
   before_action :set_blog, only: %i[show edit update destroy]
   before_action :require_blog_owner, only: %i[edit update destroy]
   before_action :require_secret_blog_access, only: %i[show]
+  before_action :authorize_random_eyecatch, only: %i[create update]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -60,6 +61,12 @@ class BlogsController < ApplicationController
     return unless !user_signed_in? || @blog.user != current_user
 
     raise ActiveRecord::RecordNotFound
+  end
+
+  def authorize_random_eyecatch
+    return unless !current_user.premium && blog_params[:random_eyecatch].present?
+
+    redirect_to request.referer || root_path, alert: 'Only premium users can enable random eyecatch.'
   end
 
   def blog_params
