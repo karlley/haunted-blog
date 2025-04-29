@@ -11,12 +11,7 @@ class BlogsController < ApplicationController
     @blogs = Blog.search(params[:term]).published.default_order
   end
 
-  def show
-    return unless @blog.secret
-    return unless !user_signed_in? || @blog.user != current_user
-
-    raise ActiveRecord::RecordNotFound
-  end
+  def show; end
 
   def new
     @blog = Blog.new
@@ -51,7 +46,7 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    @blog = Blog.find(params[:id])
+    @blog = Blog.visible_to(current_user).find(params[:id])
   end
 
   def require_blog_owner
