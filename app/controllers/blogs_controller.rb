@@ -58,7 +58,7 @@ class BlogsController < ApplicationController
   def authorize_random_eyecatch
     return unless !current_user.premium && blog_params[:random_eyecatch].present?
 
-    redirect_to request.referer || root_path, alert: 'Only premium users can enable random eyecatch.'
+    redirect_to request.referer || root_path
   end
 
   def blog_params
