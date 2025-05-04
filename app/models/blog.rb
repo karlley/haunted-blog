@@ -23,6 +23,10 @@ class Blog < ApplicationRecord
     end
   }
 
+  scope :editable_by, lambda { |user|
+    user ? where(user_id: user.id) : none
+  }
+
   def owned_by?(target_user)
     user == target_user
   end

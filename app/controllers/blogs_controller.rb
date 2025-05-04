@@ -3,8 +3,8 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
-  before_action :set_blog, only: %i[show edit update destroy]
-  before_action :require_blog_owner, only: %i[edit update destroy]
+  before_action :set_visible_blog, only: %i[show]
+  before_action :set_editable_blog, only: %i[edit update destroy]
   before_action :authorize_random_eyecatch, only: %i[create update]
 
   def index
@@ -45,14 +45,12 @@ class BlogsController < ApplicationController
 
   private
 
-  def set_blog
+  def set_visible_blog
     @blog = Blog.visible_to(current_user).find(params[:id])
   end
 
-  def require_blog_owner
-    return if current_user == @blog.user
-
-    raise ActiveRecord::RecordNotFound
+  def set_editable_blog
+    @blog = Blog.editable_by(current_user).find(params[:id])
   end
 
   def authorize_random_eyecatch
