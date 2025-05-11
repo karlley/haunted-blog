@@ -4,7 +4,6 @@ class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
   before_action :set_editable_blog, only: %i[edit update destroy]
-  before_action :authorize_random_eyecatch, only: %i[create update]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -50,13 +49,11 @@ class BlogsController < ApplicationController
     @blog = Blog.editable_by(current_user).find(params[:id])
   end
 
-  def authorize_random_eyecatch
-    return unless !current_user.premium && blog_params[:random_eyecatch].present?
-
-    redirect_to request.referer || root_path
-  end
-
   def blog_params
-    params.require(:blog).permit(:title, :content, :secret, :random_eyecatch)
+    if current_user.premium
+      params.require(:blog).permit(:title, :content, :secret, :random_eyecatch)
+    else
+      params.require(:blog).permit(:title, :content, :secret)
+    end
   end
 end
