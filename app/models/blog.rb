@@ -17,14 +17,10 @@ class Blog < ApplicationRecord
 
   scope :visible_to, lambda { |user|
     if user
-      where(secret: false).or(Blog.where(secret: true, user_id: user.id))
+      published.or(where(user:))
     else
-      where(secret: false)
+      published
     end
-  }
-
-  scope :editable_by, lambda { |user|
-    user ? where(user_id: user.id) : none
   }
 
   def owned_by?(target_user)
